@@ -1,10 +1,10 @@
 # REST-Rant-24
 
 ## Tech Usage
-CSS Framework: Bootstrap
-Stack: MonogoDB, Express, NodeJS
-Server-Side Rendering: JSX
-Node Modules: Method-override, dotenv, express-react-views
+CSS Framework: Bootstrap <br>
+Stack: MonogoDB, Express, NodeJS <br>
+Server-Side Rendering: JSX <br>
+Node Modules: Method-override, dotenv, express-react-views <br>
 
 ## Routes
 | Method | Path | Purpose |
@@ -35,6 +35,7 @@ places
 rants
 
 | Field | Type |
+| --- | --- |
 | _id | Object ID |
 | place_id | ref(places) Object_Id |
 | rant | Boolean |
