@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 
 app.get('/', (req, res) => {
-    res.render('Home');
+    res.render('error404');
 });
 
 app.set('view engine', 'jsx')
