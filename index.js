@@ -3,8 +3,11 @@ const express = require('express');
 const app = express();
 
 app.get('/', (req, res) => {
-    res.send('Hello REST-Rant World!');
+    res.render('Home');
 });
+
+app.set('view engine', 'jsx')
+app.engine('jsx', require('express-react-views').createEngine())
 
 //Load the places controller
 app.use('/places', require('./controllers/places'))
