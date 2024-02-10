@@ -19,9 +19,11 @@ main {
   background-color: white;
 }
 
-nav {
+.navbar-expand-lg{
   background-color: cornflowerblue;
   padding: 10px;
+  position: sticky;
+  top: 0;
 }
 
 nav ul {
