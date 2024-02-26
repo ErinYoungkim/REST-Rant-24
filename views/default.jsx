@@ -59,16 +59,3 @@ function Def(html) {
 
 module.exports = Def;
 
-/* <nav>
-<ul>
-  <li>
-    <a href="/">Home</a>
-  </li>
-  <li>
-  <a href="/places">Places</a>
-  </li>
-  <li>
-  <a href="/places/new">Add Places</a>
-  </li>
-</ul>
-</nav> */

@@ -1,92 +1,3 @@
-// const express = require("express");
-// const places = require("../models/places.js");
-// const router = express.Router();
-
-// router.get("/", (req, res) => {
-//   res.render("places/index", { places });
-// });
-
-// router.get("/new", (req, res) => {
-//   res.render("places/new");
-// });
-
-// router.get("/:id", (req, res) => {
-//   const id = Number(req.params.id);
-//   if (isNaN(id)) {
-//     res.status(404).render("error404");
-//   } else if (!places[id]) {
-//     res.status(404).render("error404");
-//   } else {
-//     res.render("places/show", { place: places[id], id });
-//   }
-// });
-
-// router.get("/:id/edit", (req, res) => {
-//   let id = Number(req.params.id);
-//   if (isNaN(id)) {
-//     res.render("error404");
-//   } else if (!places[id]) {
-//     res.render("error404");
-//   } else {
-//     res.render("places/edit", { place: places[id], id: id });
-//   }
-// });
-
-// router.put("/:id", (req, res) => {
-//   let id = Number(req.params.id);
-//   if (isNaN(id)) {
-//     res.render("error404");
-//   } else if (!places[id]) {
-//     res.render("error404");
-//   } else {
-//     // Dig into req.body and make sure data is valid
-//     if (!req.body.pic) {
-//       // Default image if one is not provided
-//       req.body.pic = "http://placekitten.com/400/400";
-//     }
-//     if (!req.body.city) {
-//       req.body.city = "Anytown";
-//     }
-//     if (!req.body.state) {
-//       req.body.state = "USA";
-//     }
-
-//     // Save the new data into places[id]
-//     places[id] = req.body;
-//     res.redirect(`/places/${id}`);
-//   }
-// });
-
-// router.post("/", (req, res) => {
-//   console.log(req.body);
-//   if (!req.body.pic) {
-//     //Default image if one is not provided
-//     req.body.pic = "http://placekitten.com/400/400";
-//   }
-//   if (!req.body.city) {
-//     req.body.city = "Anytown";
-//   }
-//   if (!req.body.city) {
-//     req.body.state = "USA";
-//   }
-//   places.push(req.body);
-//   res.redirect("/places");
-// });
-
-// router.delete("/:id", (req, res) => {
-//   let id = Number(req.params.id);
-//   if (isNaN(id)) {
-//     res.render("error404");
-//   } else if (!places[id]) {
-//     res.render("error404");
-//   } else {
-//     places.splice(id, 1);
-//     res.redirect("/places");
-//   }
-// });
-
-// module.exports = router;
-
 const router = require("express").Router();
 const db = require("../models");
 
@@ -106,26 +17,28 @@ router.post("/", (req, res) => {
       res.redirect("/places");
     })
     .catch((err) => {
-      if (err && err.name == 'ValidationError') {
-        let message = 'Validation Error: '
+      if (err && err.name == "ValidationError") {
+        let message = "Validation Error: ";
         for (var field in err.errors) {
-            message += `${field} was ${err.errors[field].value}. `
-            message += `${err.errors[field].message}`
+          message += `${field} was ${err.errors[field].value}. `;
+          message += `${err.errors[field].message}`;
         }
-        console.log('Validation error message', message)
-        res.render('places/new', { message })
-    }
-    else {
-        res.render('error404')
-    }
+        console.log("Validation error message", message);
+        res.render("places/new", { message });
+      } else {
+        res.render("error404");
+      }
     });
 });
 router.get("/new", (req, res) => {
-  res.render("places/new")
+  res.render("places/new");
 });
+
 router.get("/:id", (req, res) => {
   db.Place.findById(req.params.id)
+    .populate("comments")
     .then((place) => {
+      console.log(place.comments);
       res.render("places/show", { place });
     })
     .catch((err) => {
@@ -133,6 +46,7 @@ router.get("/:id", (req, res) => {
       res.render("error404");
     });
 });
+
 router.put("/:id", (req, res) => {
   res.send("PUT /places/:id stub");
 });
@@ -145,9 +59,26 @@ router.get("/:id/edit", (req, res) => {
   res.send("GET edit form stub");
 });
 
-router.post("/:id/rant", (req, res) => {
-  res.send("GET /places/:id/rant stub");
-});
+router.post('/:id/comment', (req, res) => {
+    console.log(req.body)
+    db.Place.findById(req.params.id)
+    .then(place => {
+        db.Comment.create(req.body)
+        .then(comment => {
+            place.comments.push(comment.id)
+            place.save()
+            .then(() => {
+                res.redirect(`/places/${req.params.id}`)
+            })
+        })
+        .catch(err => {
+            res.render('error404')
+        })
+    })
+    .catch(err => {
+        res.render('error404')
+    })
+})
 
 router.delete("/:id/rant/:rantId", (req, res) => {
   res.send("GET /places/:id/rant/:rantId stub");
