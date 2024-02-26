@@ -1,26 +1,32 @@
 const React = require("react");
 const Def = require("../default");
 
-function show (data) {
-    let comments = (
-      <h3 className="inactive">
-        No comments yet!
-      </h3>
-    )
-    if (data.place.comments.length) {
-      comments = data.place.comments.map(c => {
-        return (
-          <div className="border">
-            <h2 className="rant">{c.rant ? 'Rant! ðŸ˜¡' : 'Rave! ðŸ˜»'}</h2>
-            <h4>{c.content}</h4>
-            <h3>
-              <stong>- {c.author}</stong>
-            </h3>
-            <h4>Rating: {c.stars}</h4>
-          </div>
-        )
-      })
+function show(data) {
+  let comments = <h3 className="inactive">No comments yet!</h3>;
+  let rating = <h3 className="inactive">Not yet rated</h3>;
+  if (data.place.comments.length) {
+    let sumRatings = data.place.comments.reduce((tot, c) => {
+      return tot + c.stars;
+    }, 0);
+    let averageRating = Math.round(sumRatings / data.place.comments.length);
+    let stars = "";
+    for (let i = 0; i < averageRating; i++) {
+      stars += "⭐";
     }
+    rating = <h3>{stars} stars</h3>;
+    comments = data.place.comments.map((c) => {
+      return (
+        <div className="border">
+          <h2 className="rant">{c.rant ? "Rant! 😡" : "Rave! 💕"}</h2>
+          <h4>{c.content}</h4>
+          <h3>
+            <stong>- {c.author}</stong>
+          </h3>
+          <h4>Rating: {c.stars}</h4>
+        </div>
+      );
+    });
+  }
 
   const cuisinesBadges = data.place.cuisines.split(",").map((cuisine) => {
     return (
@@ -42,33 +48,42 @@ function show (data) {
               {data.place.city}, {data.place.state}
             </p>
             <p>{cuisinesBadges}</p>
-            <h2>
-              Description
-            </h2>
+            <h2>Rating</h2>
+            {rating}
+            <h2>Description</h2>
             <h3>
               Located in {data.place.city}, {data.place.state}
             </h3>
-            <h3>
-              {data.place.showEstablished ()}
-            </h3>
-            <h4>
-              Serving {data.place.cuisines}
-            </h4>
+            <h3>{data.place.showEstablished()}</h3>
+            <h4>Serving {data.place.cuisines}</h4>
           </div>
         </div>
         <div className="row align-item-center">
           <div className="col">
             <a
-              href={`/places/${data.id}/edit`}
+              href={`/places/${data.place.id}/edit`}
               className="btn btn-warning my-2"
             >
               Edit
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
-</svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-pencil-square"
+                viewBox="0 0 16 16"
+              >
+                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                <path
+                  fill-rule="evenodd"
+                  d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
+                />
+              </svg>
             </a>
-            <form method="POST" action={`/places/${data.id}?_method=DELETE`}>
+            <form
+              method="POST"
+              action={`/places/${data.place.id}?_method=DELETE`}
+            >
               <button type="submit" className="btn btn-danger my-2">
                 Delete
                 <svg
@@ -87,36 +102,59 @@ function show (data) {
           </div>
         </div>
         <div className="row">
-            <div className="form-group col-sm-12">
-                <h2>Comment</h2>
-                {comments}
-            </div>
+          <div className="form-group col-sm-12">
+            <h2>Comment</h2>
+            {comments}
+          </div>
         </div>
         <h2>Got Your own Rant or Rave</h2>
-        <form action={`/places/${data.id}/comment`} method="POST">
-            <div className="row">
-                <div className="form-group col-sm-12">
-                    <label htmlFor="content">Content</label>
-                    <textarea id="content" name="content" className="form-control"></textarea>
-                </div>
+        <form action={`/places/${data.place.id}/comment`} method="POST">
+          <div className="row">
+            <div className="form-group col-sm-12">
+              <label htmlFor="content">Content</label>
+              <textarea
+                id="content"
+                name="content"
+                className="form-control"
+              ></textarea>
             </div>
-            <div className="row">
-                <div className="form-group col-sm-4">
-                    <label htmlFor="author">Author</label>
-                    <input id="author" name="author" className="form-control"></input>
-                </div>
+          </div>
+          <div className="row">
+            <div className="form-group col-sm-4">
+              <label htmlFor="author">Author</label>
+              <input id="author" name="author" className="form-control"></input>
             </div>
-            <div className="row">
-                <div className="form-group col-sm-4">
-                <label htmlFor="stars">Star Rating</label>
-                <input type="range" step="0.5" min="1" id="stars" name="stars" className="form-control"></input>
-                </div>
+          </div>
+          <div className="row">
+            <div className="form-group col-sm-4">
+              <label htmlFor="stars">Star Rating</label>
+              <input
+                type="range"
+                step="0.5"
+                min="1"
+                max="5"
+                id="stars"
+                name="stars"
+                className="form-control"
+              ></input>
             </div>
-            <div className="form-group col-sm-1">
-                <label htmlFor="rant" className="mt-4">Rant?</label>
-                <input type="checkbox" id="rant" name="rant" className="form-check-input mt-4"></input>
-            </div>
-            <input type="submit" className="btn btn-primary" value="Add Comment"></input>
+          </div>
+          <div className="form-group col-sm-1">
+            <label htmlFor="rant" className="mt-4">
+              Rant?
+            </label>
+            <input
+              type="checkbox"
+              id="rant"
+              name="rant"
+              className="form-check-input mt-4"
+            ></input>
+          </div>
+          <input
+            type="submit"
+            className="btn btn-primary"
+            value="Add Comment"
+          ></input>
         </form>
       </main>
     </Def>
